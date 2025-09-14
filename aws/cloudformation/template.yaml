@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'WhatsApp Chatbot API - Serverless Application'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Environment name
+  
+  WhatsAppVerifyToken:
+    Type: String
+    NoEcho: true
+    Description: WhatsApp webhook verification token
+  
+  WhatsAppAccessToken:
+    Type: String
+    NoEcho: true
+    Description: WhatsApp Business API access token
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: go1.x
+    Environment:
+      Variables:
+        WHATSAPP_VERIFY_TOKEN: !Ref WhatsAppVerifyToken
+        WHATSAPP_ACCESS_TOKEN: !Ref WhatsAppAccessToken
+        LOG_LEVEL: info
+
+Resources:
+  # Lambda Function
+  WhatsAppChatbotFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${Environment}-chatbot-wsp'
+      CodeUri: ../../
+      Handler: main
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            RestApiId: !Ref WhatsAppChatbotApi
+        RootApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+            RestApiId: !Ref WhatsAppChatbotApi
+
+  # API Gateway
+  WhatsAppChatbotApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub '${Environment}-chatbot-wsp-api'
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  # CloudWatch Log Group
+  WhatsAppChatbotLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${Environment}-chatbot-wsp'
+      RetentionInDays: 14
+
+  # IAM Role for Lambda
+  WhatsAppChatbotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${Environment}-chatbot-wsp-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+Outputs:
+  ApiUrl:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${WhatsAppChatbotApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/'
+    Export:
+      Name: !Sub '${Environment}-chatbot-wsp-api-url'
+  
+  FunctionName:
+    Description: 'Lambda Function Name'
+    Value: !Ref WhatsAppChatbotFunction
+    Export:
+      Name: !Sub '${Environment}-chatbot-wsp-function-name'

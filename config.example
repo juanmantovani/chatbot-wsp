@@ -1,0 +1,16 @@
+# Server Configuration
+PORT=8080
+HOST=0.0.0.0
+
+# WhatsApp Business API Configuration
+WHATSAPP_VERIFY_TOKEN=your_verify_token_here
+WHATSAPP_ACCESS_TOKEN=your_access_token_here
+WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id_here
+
+# AWS Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+
+# Logging
+LOG_LEVEL=info
