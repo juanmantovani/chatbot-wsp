@@ -27,6 +27,7 @@ type Config struct {
 	VerifyToken   string
 	AccessToken   string
 	PhoneNumberID string
+	MyPhoneNumber string
 }
 
 // NewWhatsAppHandler creates a new WhatsApp handler
@@ -187,7 +188,7 @@ func (h *WhatsAppHandler) processMessages(messages []models.WhatsAppMessage) (pr
 // sendMessage sends a message to WhatsApp Business API
 func (h *WhatsAppHandler) sendMessage(response *models.WhatsAppResponse) error {
 	// Check if we have the required configuration
-	if h.config.AccessToken == "" || h.config.PhoneNumberID == "" {
+	if h.config.AccessToken == "" || h.config.PhoneNumberID == "" || h.config.MyPhoneNumber == "" {
 		logger.GetLogger().Warn("WhatsApp configuration missing - skipping message send")
 		return fmt.Errorf("WhatsApp configuration incomplete")
 	}
@@ -195,7 +196,7 @@ func (h *WhatsAppHandler) sendMessage(response *models.WhatsAppResponse) error {
 	// Prepare the request payload
 	payload := map[string]interface{}{
 		"messaging_product": response.MessagingProduct,
-		"to":                response.To,
+		"to":                h.config.MyPhoneNumber,
 		"type":              response.Type,
 		"text": map[string]interface{}{
 			"body": response.Text.Body,

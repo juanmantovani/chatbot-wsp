@@ -42,8 +42,10 @@ func main() {
 
 	// Initialize handler
 	whatsappHandler := handlers.NewWhatsAppHandler(chatbotService, &handlers.Config{
-		VerifyToken: cfg.WhatsApp.VerifyToken,
-		AccessToken: cfg.WhatsApp.AccessToken,
+		VerifyToken:   cfg.WhatsApp.VerifyToken,
+		AccessToken:   cfg.WhatsApp.AccessToken,
+		PhoneNumberID: cfg.WhatsApp.PhoneNumberID,
+		MyPhoneNumber: cfg.WhatsApp.MyPhoneNumber,
 	})
 
 	// Setup routes

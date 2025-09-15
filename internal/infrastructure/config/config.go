@@ -27,6 +27,7 @@ type WhatsAppConfig struct {
 	AccessToken   string
 	WebhookURL    string
 	PhoneNumberID string
+	MyPhoneNumber string
 }
 
 // AWSConfig holds AWS configuration
@@ -58,6 +59,7 @@ func Load() (*Config, error) {
 			AccessToken:   getEnv("WHATSAPP_ACCESS_TOKEN", ""),
 			WebhookURL:    getEnv("WHATSAPP_WEBHOOK_URL", ""),
 			PhoneNumberID: getEnv("WHATSAPP_PHONE_NUMBER_ID", ""),
+			MyPhoneNumber: getEnv("MY_PHONE_NUMBER", ""),
 		},
 		AWS: AWSConfig{
 			Region:          getEnv("AWS_REGION", "us-east-1"),
