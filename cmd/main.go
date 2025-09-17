@@ -37,6 +37,10 @@ func main() {
 	// Initialize repository
 	chatbotRepo := repository.NewInMemoryChatbotRepository()
 
+	// Start session cleanup
+	chatbotRepo.StartSessionCleanup(cfg.Session.ExpirationHours, cfg.Session.CleanupIntervalMin)
+	defer chatbotRepo.StopSessionCleanup()
+
 	// Initialize service
 	chatbotService := service.NewChatbotService(chatbotRepo)
 

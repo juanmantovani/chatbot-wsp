@@ -87,18 +87,11 @@ func (s *chatbotService) handleWelcomeState(userState *models.ChatbotState, mess
 		return response, "collecting_data", nil
 	}
 
-	// If not a valid option, show welcome message again
-	flow, err := s.repo.GetFlowByState("welcome")
-	if err != nil {
-		return nil, "", err
-	}
-
 	response := &models.WhatsAppResponse{
 		MessagingProduct: "whatsapp",
 		To:               userState.UserID,
 		Type:             "text",
 	}
-	response.Text.Body = s.formatWelcomeMessage(flow)
 
 	return response, "welcome", nil
 }
@@ -145,18 +138,11 @@ func (s *chatbotService) handleDataCollectionState(userState *models.ChatbotStat
 		return response, "collecting_data", nil
 	}
 
-	// Show menu again
-	flow, err := s.repo.GetFlowByState("welcome")
-	if err != nil {
-		return nil, "", err
-	}
-
 	response := &models.WhatsAppResponse{
 		MessagingProduct: "whatsapp",
 		To:               userState.UserID,
 		Type:             "text",
 	}
-	response.Text.Body = s.formatWelcomeMessage(flow)
 
 	return response, "welcome", nil
 }

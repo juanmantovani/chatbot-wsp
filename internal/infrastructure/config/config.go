@@ -13,6 +13,7 @@ type Config struct {
 	WhatsApp WhatsAppConfig
 	AWS      AWSConfig
 	Logging  LoggingConfig
+	Session  SessionConfig
 }
 
 // ServerConfig holds server configuration
@@ -42,6 +43,12 @@ type LoggingConfig struct {
 	Level string
 }
 
+// SessionConfig holds session management configuration
+type SessionConfig struct {
+	ExpirationHours    int // Hours after which a session expires
+	CleanupIntervalMin int // Minutes between cleanup runs
+}
+
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
 	// Load .env file if it exists
@@ -68,6 +75,10 @@ func Load() (*Config, error) {
 		},
 		Logging: LoggingConfig{
 			Level: getEnv("LOG_LEVEL", "info"),
+		},
+		Session: SessionConfig{
+			ExpirationHours:    getEnvAsInt("SESSION_EXPIRATION_HOURS", 24),     // 24 hours default
+			CleanupIntervalMin: getEnvAsInt("SESSION_CLEANUP_INTERVAL_MIN", 30), // 30 minutes default
 		},
 	}
 
